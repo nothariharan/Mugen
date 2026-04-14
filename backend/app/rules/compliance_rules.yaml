@@ -1,0 +1,22 @@
+domains:
+  hiring:
+    recommended_metric: demographic_parity
+    thresholds:
+      disparate_impact: 0.80   # 80% rule — EEOC standard
+      equal_opportunity_diff: 0.05
+    regulations: ["EU AI Act Art. 10", "NYC Local Law 144"]
+    fail_message: "Model violates the 80% rule for hiring (EEOC standard)."
+  finance:
+    recommended_metric: equalized_odds
+    thresholds:
+      disparate_impact: 0.80
+      fnr_gap: 0.10
+    regulations: ["EU AI Act Art. 10", "Equal Credit Opportunity Act"]
+    fail_message: "Model shows disparate impact in credit decisions."
+  healthcare:
+    recommended_metric: equalized_odds
+    thresholds:
+      fnr_gap: 0.05   # Tight — missed diagnoses carry life/death weight
+      equal_opportunity_diff: 0.05
+    regulations: ["EU AI Act Art. 14", "Section 1557 ACA"]
+    fail_message: "Model has unequal False Negative Rates across patient groups."
