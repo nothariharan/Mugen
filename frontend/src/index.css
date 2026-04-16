@@ -1,12 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  body {
-    @apply antialiased text-slate-900 bg-slate-50;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
+body {
+  @apply antialiased text-slate-900 bg-slate-50;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .animate-pulse {
