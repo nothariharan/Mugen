@@ -1,12 +1,13 @@
 fastapi
 uvicorn
 python-multipart
-deepchecks
+deepchecks==0.18.*
 modelscan
 shap
 dice-ml
 aequitas
-tensorflow-model-analysis
+# Specific TFMA version for TF 2.13 concurrency
+tensorflow-model-analysis==0.45.0
 aif360
 fairlearn
 evidently
@@ -19,3 +20,8 @@ pandas
 numpy
 scipy
 pydantic
+tensorflow==2.13.0
+# Helper pins to stop backtracking
+protobuf==3.20.3
+googleapis-common-protos==1.56.4
+grpcio==1.56.2

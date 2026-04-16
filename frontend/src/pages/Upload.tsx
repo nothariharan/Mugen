@@ -35,7 +35,7 @@ const UploadPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] p-4 max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Detect & Fix AI Bias</h1>
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Mugen</h1>
         <p className="text-slate-600">The world's first explainable AI auditor for compliance teams.</p>
       </div>
 

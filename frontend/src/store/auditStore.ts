@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface AuditState {
   uploadId: string | null;
@@ -16,7 +17,9 @@ interface AuditState {
   setFixResult: (result: any) => void;
 }
 
-export const useAuditStore = create<AuditState>((set) => ({
+export const useAuditStore = create<AuditState>()(
+  persist(
+    (set) => ({
   uploadId: null,
   auditId: null,
   fixId: null,
@@ -30,4 +33,5 @@ export const useAuditStore = create<AuditState>((set) => ({
   setDomain: (domain) => set({ domain }),
   setAuditResult: (result) => set({ auditResult: result }),
   setFixResult: (result) => set({ fixResult: result }),
-}));
+}), { name: 'mugen-audit-storage' })
+);
