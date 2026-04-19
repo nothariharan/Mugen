@@ -9,9 +9,23 @@ def explain_model_shap(model, df: pd.DataFrame, target_col: str, sample_size: in
     X = df.drop(columns=[target_col])
     
     # Check model type for best SHAP explainer
-    # For POC, use KernelExplainer fallback for generalizability
-    # In production, check for tree models to use TreeExplainer (faster)
-    explainer = shap.KernelExplainer(model.predict_proba, shap.kmeans(X, 10))
+    # Use TreeExplainer for tree models (faster)
+    try:
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.tree import DecisionTreeClassifier
+        tree_based = isinstance(model, (RandomForestClassifier, DecisionTreeClassifier))
+    except Exception:
+        tree_based = False
+        
+    if tree_based:
+        explainer = shap.TreeExplainer(model)
+        shap_values_obj = explainer(X.sample(min(sample_size, len(X)), random_state=42))
+        shap_values = shap_values_obj.values
+        sample_df = X.sample(min(sample_size, len(X)), random_state=42)
+    else:
+        explainer = shap.KernelExplainer(model.predict_proba, shap.kmeans(X, 10))
+        sample_df = X.sample(min(sample_size, len(X)), random_state=42)
+        shap_values = explainer.shap_values(sample_df)
     
     # SHAP values for a sample
     sample_df = X.sample(min(sample_size, len(X)), random_state=42)

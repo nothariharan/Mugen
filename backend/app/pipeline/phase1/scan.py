@@ -1,4 +1,4 @@
-from modelscan import ModelScan
+from modelscan.modelscan import ModelScan
 
 def run_security_scan(model_path: str) -> dict:
     """

@@ -17,7 +17,7 @@ def generate_pdf_report(audit_id: str, fix_id: str,
     elements = []
 
     # Title
-    elements.append(Paragraph("<b>Explainable AI Auditor Compliance Report</b>", styles['Title']))
+    elements.append(Paragraph("<b>Mugen Compliance Report</b>", styles['Title']))
     elements.append(Spacer(1, 12))
 
     # Executive Summary

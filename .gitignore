@@ -1,0 +1,47 @@
+# Design assets (local planning files — not part of source code)
+_design_assets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+*.pkl
+*.h5
+*.pt
+*.pth
+
+# Env / secrets
+.env
+.env.*
+*.env
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# Specific project venvs
+venv_39/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+*.log
+
+# Uploads / generated files (temp artifacts)
+backend/uploads/
+backend/tmp/
