@@ -104,7 +104,7 @@ async def run_full_audit(audit_id: str, request: AuditRequest):
         # 4. Slices
         slices = slicer.discover_bias_slices(df, label_col, sensitive_col, 'y_pred')
         # 5. SHAP
-        shap_res = shap_explainer.explain_model_shap(model, df, label_col, sample_size=500)
+        shap_res = shap_explainer.explain_model_shap(model, df.drop(columns=['y_pred']), label_col, sample_size=500)
         # 6. Aequitas Grid
         aequitas_grid = aequitas_report.generate_aequitas_grid(df, label_col, 'y_pred', sensitive_col)
         # 7. Composite Score

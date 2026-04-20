@@ -12,13 +12,15 @@ aif360
 fairlearn
 evidently
 google-generativeai
+boto3
+python-dotenv
 reportlab
 pyyaml
 scikit-learn==1.3.2
 xgboost
-pandas
-numpy
-scipy
+pandas<2.2.0
+numpy<=1.24.3
+scipy<1.13.0
 pydantic
 tensorflow==2.13.0
 # Helper pins to stop backtracking

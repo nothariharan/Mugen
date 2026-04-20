@@ -1,5 +1,6 @@
 import React from 'react';
-import Plot from 'react-plotly.js';
+import PlotlyPlot from 'react-plotly.js';
+const Plot = (PlotlyPlot as any).default || PlotlyPlot;
 
 interface BiasScoreGaugeProps {
   score: number;
