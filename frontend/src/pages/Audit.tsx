@@ -30,6 +30,11 @@ const AuditPage: React.FC = () => {
             setAuditResult(res.result);
             setLoading(false);
             clearInterval(poll);
+          } else if (res.status === 'error') {
+            clearInterval(poll);
+            setLoading(false);
+            alert(`Audit Failed: ${res.message || "Unknown server error"}`);
+            navigate('/');
           }
         }, 1500);
       } catch (err) {

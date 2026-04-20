@@ -41,7 +41,11 @@ def discover_bias_slices(df: pd.DataFrame,
         else:
             # Leaf node: compute FNR gap
             # Error probability in this leaf
-            error_prob = tree_.value[node][0][1] / tree_.value[node][0].sum()
+            value_array = tree_.value[node][0]
+            if len(value_array) > 1:
+                error_prob = value_array[1] / value_array.sum()
+            else:
+                error_prob = 1.0 if dt.classes_[0] == 1 else 0.0
             if error_prob > 0.3: # Threshold for "at risk" pocket
                 slices.append({
                     "group": " & ".join([f"{n} {o} {t:.1f}" for n, o, t in path]),
