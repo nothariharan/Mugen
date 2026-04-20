@@ -1,22 +1,30 @@
 import google.generativeai as genai
 import os
 import json
+import boto3
+from dotenv import load_dotenv
 
-# Fetching GEMINI_API_KEY from environment
+# Load env variables from .env file
+load_dotenv()
+
+# Fetch configs
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    gemini_model = genai.GenerativeModel("gemini-1.5-pro")
 
 async def get_gemini_verdict(domain: str, rules_verdict_json: dict, metrics_json: dict, 
                              shap_top5: dict, dice_example: dict, 
                              before_score: float, after_score: float) -> dict:
     """
-    Using Gemini for plain-English explanation of compliance and bias metrics.
+    Using Gemini or AWS Bedrock for plain-English explanation of compliance and bias metrics.
     """
-    if not GEMINI_API_KEY:
-        return {"summary": "Gemini API key not found. Manual verification required."}
+    if not GEMINI_API_KEY and not AWS_ACCESS_KEY_ID:
+        return {"summary": "No LLM API keys found (Gemini or AWS). Manual verification required."}
         
     system_prompt = (
         "You are a compliance report writer for an AI governance platform. "
@@ -24,7 +32,8 @@ async def get_gemini_verdict(domain: str, rules_verdict_json: dict, metrics_json
         "1. Write a plain-English executive summary (2 paragraphs, no jargon). "
         "2. Write one sentence per EU AI Act article explaining how the metric satisfies it. "
         "3. Never claim the model is 'legal' or 'illegal' — use 'meets threshold' / 'fails threshold'. "
-        "4. Output JSON: { \"summary\": \"...\", \"article_10\": \"...\", \"article_12\": \"...\", \"article_14\": \"...\", \"recourse_explanation\": \"...\" }"
+        "4. Output JSON: { \"summary\": \"...\", \"article_10\": \"...\", \"article_12\": \"...\", \"article_14\": \"...\", \"recourse_explanation\": \"...\" }\n"
+        "Output ONLY valid JSON."
     )
     
     user_prompt = f"""
@@ -36,20 +45,59 @@ async def get_gemini_verdict(domain: str, rules_verdict_json: dict, metrics_json
     Before score: {before_score} | After score: {after_score}
     """
     
-    # Generate content using Gemini
-    response = await model.generate_content_async(
-        f"{system_prompt}\n\nUSER:\n{user_prompt}"
-    )
-    
-    # Extract JSON from response text (Gemini might add markdown)
     try:
-        raw_text = response.text
+        raw_text = ""
+        
+        if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+            # Route to AWS Bedrock (Claude 3 Haiku)
+            bedrock_client = boto3.client(
+                "bedrock-runtime",
+                aws_access_key_id=AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                region_name=AWS_REGION
+            )
+            
+            body = json.dumps({
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 1000,
+                "system": system_prompt,
+                "messages": [
+                    {"role": "user", "content": user_prompt}
+                ]
+            })
+            
+            # Using synchronous call since boto3 is blocking by default 
+            import asyncio
+            response = await asyncio.to_thread(
+                bedrock_client.invoke_model,
+                modelId="anthropic.claude-3-haiku-20240307-v1:0", 
+                body=body
+            )
+            
+            response_body = json.loads(response.get('body').read())
+            raw_text = response_body.get('content')[0]['text']
+            
+        elif GEMINI_API_KEY:
+            # Route to Gemini
+            response = await gemini_model.generate_content_async(
+                f"{system_prompt}\n\nUSER:\n{user_prompt}"
+            )
+            raw_text = response.text
+            
+        # Extract JSON from response text (Models might add markdown blocks)
         start_idx = raw_text.find('{')
         end_idx = raw_text.rfind('}') + 1
+        
+        if start_idx == -1 or end_idx == 0:
+            raise ValueError("No JSON object found in response.")
+            
         json_str = raw_text[start_idx:end_idx]
         return json.loads(json_str)
+        
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return {
-            "summary": "Error parsing Gemini response.",
-            "raw": response.text if hasattr(response, 'text') else str(e)
+            "summary": "Error parsing LLM response.",
+            "raw": str(e)
         }
