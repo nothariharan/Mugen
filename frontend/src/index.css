@@ -1,24 +1,62 @@
 @import "tailwindcss";
 
-body {
-  @apply antialiased text-slate-900 bg-slate-50;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+@theme {
+  --font-sans: 'Schibsted Grotesk', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+
+  /* Seamless OKLCH Palette */
+  --color-paper: oklch(0.99 0.002 80);
+  --color-surface: oklch(0.97 0.005 80);
+  --color-ink: oklch(0.18 0.015 250);
+  --color-ink-muted: oklch(0.45 0.015 250);
+  --color-ink-faint: oklch(0.85 0.01 250);
+  --color-brand-default: oklch(0.45 0.12 250);
+  --color-brand-hover: oklch(0.35 0.12 250);
+  --color-brand-surface: oklch(0.95 0.02 250);
+  
+  --color-success-default: oklch(0.6 0.15 150);
+  --color-success-surface: oklch(0.95 0.03 150);
+  --color-danger-default: oklch(0.55 0.18 30);
+  --color-danger-surface: oklch(0.95 0.03 30);
+  --color-warning-default: oklch(0.7 0.15 65);
+  --color-warning-surface: oklch(0.95 0.05 65);
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  
+  --animate-stagger-1: fade-in-up 0.6s var(--ease-out-quint) 0.1s both;
+  --animate-stagger-2: fade-in-up 0.6s var(--ease-out-quint) 0.2s both;
+  --animate-stagger-3: fade-in-up 0.6s var(--ease-out-quint) 0.3s both;
+  --animate-stagger-4: fade-in-up 0.6s var(--ease-out-quint) 0.4s both;
+  --animate-stagger-5: fade-in-up 0.6s var(--ease-out-quint) 0.5s both;
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-spin: spin 1s linear infinite;
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .5; }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
+@layer base {
+  body {
+    @apply antialiased text-ink bg-paper;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
 }

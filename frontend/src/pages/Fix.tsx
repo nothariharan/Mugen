@@ -19,7 +19,6 @@ const FixPage: React.FC = () => {
     setPathway(selectedPathway);
     setLoading(true);
     try {
-      // Mock duration for POC progress visualization
       await new Promise(r => setTimeout(r, 2000));
       const res = await apiClient.startFix(auditId, selectedPathway, auditResult.recommended_metric);
       setFixId(res.fix_id);
@@ -47,84 +46,87 @@ const FixPage: React.FC = () => {
   };
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-      <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-      <div className="text-slate-600 font-medium animate-pulse">Running Phase 2 Pipeline: {pathway === 'quick' ? 'Fairlearn' : 'AIF360'} Mitigation...</div>
-      <div className="text-xs text-slate-400">Applying thresholds & validating results...</div>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 animate-in fade-in">
+      <div className="w-12 h-12 border-2 border-brand-default border-t-transparent rounded-full animate-spin"></div>
+      <div className="text-ink font-bold animate-pulse">Running Phase 2 Pipeline: {pathway === 'quick' ? 'Fairlearn' : 'AIF360'} Mitigation...</div>
+      <div className="text-xs text-ink-muted uppercase tracking-widest">Applying thresholds & validating results</div>
     </div>
   );
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
-      <h2 className="text-3xl font-extrabold text-slate-900 leading-tight">Mitigation Dashboard</h2>
+    <div className="max-w-7xl mx-auto space-y-12 pb-24">
+      <div className="border-b border-surface pb-6 animate-stagger-1">
+        <h2 className="text-5xl font-display font-extrabold text-ink leading-tight tracking-tight">Mitigation Studio</h2>
+      </div>
 
       {!fixResult ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 animate-stagger-2">
           <div
             onClick={() => handleFix('quick')}
-            className="p-8 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group shadow-sm bg-white"
+            className="p-10 border border-surface rounded bg-paper cursor-pointer hover:border-brand-default hover:bg-brand-surface transition-all duration-300 ease-out-expo group hover:-translate-y-1 hover:shadow-md"
           >
-            <div className="text-blue-600 font-bold mb-2 text-xl group-hover:scale-105 transition-transform origin-left">Quick Fix (Fairlearn)</div>
-            <p className="text-slate-600 text-sm leading-relaxed mb-4">
+            <div className="text-brand-default font-extrabold mb-4 text-2xl font-display group-hover:scale-[1.02] transition-transform origin-left">Quick Fix (Fairlearn)</div>
+            <p className="text-ink-muted text-base leading-relaxed mb-8">
               Post-processing optimization. We don't touch your training data or model weights. We adjust the classification thresholds to satisfy <b>{auditResult.recommended_metric}</b>.
             </p>
-            <ul className="text-xs text-slate-400 space-y-2 mb-6">
-              <li>✓ Ready in seconds</li>
-              <li>✓ Works for black-box models</li>
-              <li>✗ Slight impact on accuracy</li>
+            <ul className="text-sm text-ink-faint space-y-3 mb-10 font-medium tracking-wide">
+              <li className="flex items-center"><span className="text-brand-default mr-2 font-bold opacity-0 group-hover:opacity-100 transition-opacity">→</span> Ready in seconds</li>
+              <li className="flex items-center"><span className="text-brand-default mr-2 font-bold opacity-0 group-hover:opacity-100 transition-opacity">→</span> Works for black-box models</li>
+              <li className="flex items-center"><span className="text-ink-faint mr-2 font-bold opacity-0 group-hover:opacity-100 transition-opacity">→</span> Slight impact on accuracy</li>
             </ul>
-            <button className="w-full py-3 bg-slate-900 text-white font-bold rounded-lg group-hover:bg-blue-600 transition-all">Select Quick Fix</button>
+            <button className="w-full py-4 bg-ink text-paper font-bold rounded group-hover:bg-brand-default transition-colors duration-300">Select Quick Fix</button>
           </div>
 
           <div
             onClick={() => handleFix('deep')}
-            className="p-8 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all group shadow-sm bg-white"
+            className="p-10 border border-surface rounded bg-paper cursor-pointer hover:border-success-default hover:bg-success-surface transition-all duration-300 ease-out-expo group hover:-translate-y-1 hover:shadow-md"
           >
-            <div className="text-green-600 font-bold mb-2 text-xl group-hover:scale-105 transition-transform origin-left">Deep Fix (AIF360)</div>
-            <p className="text-slate-600 text-sm leading-relaxed mb-4">
+            <div className="text-success-default font-extrabold mb-4 text-2xl font-display group-hover:scale-[1.02] transition-transform origin-left">Deep Fix (AIF360)</div>
+            <p className="text-ink-muted text-base leading-relaxed mb-8">
               Pre-processing reweighing. We fix the underlying data distribution bias and retrain a new model (Random Forest). More robust for long-term compliance.
             </p>
-            <ul className="text-xs text-slate-400 space-y-2 mb-6">
-              <li>✓ Fixes bias at the source</li>
-              <li>✓ Higher quality predictions</li>
-              <li>✗ Requires access to training data</li>
+            <ul className="text-sm text-ink-faint space-y-3 mb-10 font-medium tracking-wide">
+              <li className="flex items-center"><span className="text-success-default mr-2 font-bold opacity-0 group-hover:opacity-100 transition-opacity">→</span> Fixes bias at the source</li>
+              <li className="flex items-center"><span className="text-success-default mr-2 font-bold opacity-0 group-hover:opacity-100 transition-opacity">→</span> Higher quality predictions</li>
+              <li className="flex items-center"><span className="text-ink-faint mr-2 font-bold opacity-0 group-hover:opacity-100 transition-opacity">→</span> Requires access to training data</li>
             </ul>
-            <button className="w-full py-3 bg-slate-900 text-white font-bold rounded-lg group-hover:bg-green-600 transition-all">Select Deep Fix</button>
+            <button className="w-full py-4 bg-ink text-paper font-bold rounded group-hover:bg-success-default transition-colors duration-300">Select Deep Fix</button>
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
-          <div className="bg-white p-8 rounded-2xl border-2 border-green-200 shadow-xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 bg-green-500 text-white font-bold text-xs uppercase tracking-widest rounded-bl-xl">Success</div>
-            <h3 className="text-2xl font-extrabold text-slate-900 mb-8">Mitigation Results</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div className="flex flex-col items-center">
+        <div className="animate-in slide-in-from-bottom-8 duration-700 ease-out-expo">
+          <div className="bg-paper p-10 rounded border border-surface shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 py-2 px-6 bg-success-default text-paper font-bold text-[10px] uppercase tracking-[0.2em] rounded-bl">Mitigation Complete</div>
+            <h3 className="text-4xl font-display font-extrabold text-ink mb-12">Mitigation Results</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+              <div className="flex flex-col items-center p-8 bg-surface border border-surface/50 rounded">
                 <BiasScoreGauge score={fixResult.before_score} title="Before Fix" />
-                <div className="text-red-500 font-bold mt-4">CRITICAL BIAS FOUND</div>
+                <div className="text-danger-default font-bold mt-6 tracking-wide text-sm">CRITICAL BIAS FOUND</div>
               </div>
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center p-8 border-2 border-brand-default rounded bg-brand-surface">
                 <BiasScoreGauge score={fixResult.after_score} title="After Fix" />
-                <div className="text-green-600 font-bold mt-4 flex items-center">
-                  <span className="mr-2">✓</span> COMPLIANCE THRESHOLD MET
+                <div className="text-brand-default font-bold mt-6 flex items-center tracking-wide text-sm">
+                  <span className="mr-2 text-lg leading-none">✓</span> COMPLIANCE THRESHOLD MET
                 </div>
               </div>
             </div>
 
-            <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-               <div className="text-slate-600 text-sm">
-                 <div className="font-bold text-slate-800">Final Verdict:</div>
-                 Your model is now compliant with <b>EU AI Act Article 10</b> thresholds for {auditResult.recommended_metric}.
+            <div className="mt-16 pt-10 border-t border-surface flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+               <div className="text-ink-muted text-sm max-w-sm leading-relaxed">
+                 <div className="font-bold text-ink uppercase tracking-widest text-[10px] mb-2">Final Verdict</div>
+                 Your model is now compliant with <b>EU AI Act Article 10</b> requirements regarding <b>{auditResult.recommended_metric}</b>.
                </div>
                <div className="flex gap-4">
                  <button
                    onClick={handleDownload}
-                   className="px-8 py-3 bg-slate-900 text-white font-bold rounded-lg hover:bg-black transition-all shadow-md active:scale-95 flex items-center"
+                   className="px-8 py-4 bg-ink text-paper font-bold rounded hover:bg-brand-default transition-colors duration-300"
                  >
                    Download Compliance Report (.PDF)
                  </button>
                  <a
                    href={fixResult.fixed_model_url}
-                   className="px-8 py-3 border-2 border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-all active:scale-95"
+                   className="px-8 py-4 border border-surface text-ink font-bold rounded hover:bg-surface transition-colors duration-300"
                  >
                    Download Fixed Model (.PKL)
                  </a>
