@@ -25,14 +25,14 @@ async def start_fix(request: FixRequest):
     if not audit or audit.get("status") != "done":
         raise HTTPException(status_code=404, detail="Audit result not found or not done")
     
-    df = audit['full_df']
+    df = audit['full_df'].drop(columns=['y_pred'], errors='ignore')
     model = audit['model']
     label_col = audit['label_col']
     sensitive_col = audit['sensitive_col']
     priv_group = audit['priv_group']
     unpriv_group = audit['unpriv_group']
     
-    X = df.drop(columns=[label_col])
+    X = df.drop(columns=[label_col, 'y_pred'], errors='ignore')
     y = df[label_col]
     
     try:
