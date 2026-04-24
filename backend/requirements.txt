@@ -11,8 +11,9 @@ tensorflow-model-analysis==0.45.0
 aif360
 fairlearn
 evidently
-google-generativeai
+google-genai
 boto3
+cloudpickle
 python-dotenv
 reportlab
 pyyaml
