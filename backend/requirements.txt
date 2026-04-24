@@ -13,6 +13,7 @@ fairlearn
 evidently
 google-genai
 boto3
+cloudpickle
 python-dotenv
 reportlab
 pyyaml

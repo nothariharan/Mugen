@@ -2,41 +2,50 @@ from aif360.metrics import ClassificationMetric
 from aif360.datasets import BinaryLabelDataset
 import pandas as pd
 
-def compute_post_fix_metrics(model, df: pd.DataFrame, label_col: str, sensitive_col: str, 
-                              privileged_groups: list, unprivileged_groups: list) -> dict:
+
+def compute_post_fix_metrics(model, df: pd.DataFrame, label_col: str, sensitive_col: str,
+                              privileged_groups: list, unprivileged_groups: list,
+                              pathway: str = "deep") -> dict:
     """
     Computes post-fix fairness metrics by running predictions from the fixed model
-    and feeding it into AIF360 ClassificationMetric.
+    and feeding them into AIF360 ClassificationMetric.
+
+    pathway="quick" → model is a Fairlearn ThresholdOptimizer (needs sensitive_features kwarg).
+    pathway="deep"  → model is a plain sklearn RandomForest (standard predict).
     """
-    # Create dataset objects
+    # Ground-truth AIF360 dataset
     dataset = BinaryLabelDataset(
         df=df,
         label_names=[label_col],
         protected_attribute_names=[sensitive_col]
     )
-    
-    # Get predictions
-    df_pred = df.copy()
+
+    # Feature matrix (no label)
     X = df.drop(columns=[label_col])
-    # fairlearn ThresholdOptimizer has 'predict' that acts like a standard model
-    df_pred[label_col] = model.predict(X)
-    
+
+    df_pred = df.copy()
+    if pathway == "quick":
+        # ThresholdOptimizer.predict() requires sensitive_features
+        df_pred[label_col] = model.predict(X, sensitive_features=X[sensitive_col])
+    else:
+        # Plain sklearn estimator
+        df_pred[label_col] = model.predict(X)
+
     dataset_pred = BinaryLabelDataset(
         df=df_pred,
         label_names=[label_col],
         protected_attribute_names=[sensitive_col]
     )
-    
-    # Metrics
+
     metric_pred = ClassificationMetric(
-        dataset, 
-        dataset_pred, 
-        unprivileged_groups=unprivileged_groups, 
+        dataset,
+        dataset_pred,
+        unprivileged_groups=unprivileged_groups,
         privileged_groups=privileged_groups
     )
-    
+
     return {
-        "disparate_impact": round(metric_pred.disparate_impact(), 3),
+        "disparate_impact":      round(metric_pred.disparate_impact(), 3),
         "equal_opportunity_diff": round(metric_pred.equal_opportunity_difference(), 3),
-        "fnr_gap": round(metric_pred.false_negative_rate_difference(), 3)
+        "fnr_gap":               round(metric_pred.false_negative_rate_difference(), 3),
     }
