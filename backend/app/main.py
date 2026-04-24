@@ -1,6 +1,11 @@
+import warnings
+# Suppress known third-party FutureWarnings that cannot be fixed without upgrading Python
+warnings.filterwarnings("ignore", category=FutureWarning, module="google")
+warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import upload, audit, fix, report, datasets
+from .routers import upload, audit, fix, report, datasets, download, drift
 
 app = FastAPI(title="Mugen API")
 
@@ -17,7 +22,6 @@ app.include_router(audit.router, prefix="/api", tags=["audit"])
 app.include_router(fix.router, prefix="/api", tags=["fix"])
 app.include_router(report.router, prefix="/api", tags=["report"])
 app.include_router(datasets.router, prefix="/api", tags=["datasets"])
-from .routers import download, drift
 app.include_router(download.router, prefix="/api", tags=["download"])
 app.include_router(drift.router, prefix="/api", tags=["drift"])
 

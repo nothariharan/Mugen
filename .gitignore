@@ -45,3 +45,7 @@ venv_39/
 # Uploads / generated files (temp artifacts)
 backend/uploads/
 backend/tmp/
+
+# Agent / Skills (local tool configurations)
+.agents/
+skills-lock.json
