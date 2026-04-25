@@ -1,6 +1,19 @@
+import math
 from aif360.metrics import ClassificationMetric
 from aif360.datasets import BinaryLabelDataset
 import pandas as pd
+
+
+def _safe_round(value: float, default: float) -> float:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return default
+
+    if not math.isfinite(numeric):
+        return default
+
+    return round(numeric, 3)
 
 
 def compute_post_fix_metrics(model, df: pd.DataFrame, label_col: str, sensitive_col: str,
@@ -45,7 +58,7 @@ def compute_post_fix_metrics(model, df: pd.DataFrame, label_col: str, sensitive_
     )
 
     return {
-        "disparate_impact":      round(metric_pred.disparate_impact(), 3),
-        "equal_opportunity_diff": round(metric_pred.equal_opportunity_difference(), 3),
-        "fnr_gap":               round(metric_pred.false_negative_rate_difference(), 3),
+        "disparate_impact":      _safe_round(metric_pred.disparate_impact(), 0.0),
+        "equal_opportunity_diff": _safe_round(metric_pred.equal_opportunity_difference(), 1.0),
+        "fnr_gap":               _safe_round(metric_pred.false_negative_rate_difference(), 1.0),
     }

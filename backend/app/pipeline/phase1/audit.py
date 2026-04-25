@@ -1,6 +1,19 @@
+import math
 import pandas as pd
 from aif360.datasets import BinaryLabelDataset
 from aif360.metrics import BinaryLabelDatasetMetric, ClassificationMetric
+
+
+def _safe_round(value: float, default: float) -> float:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return default
+
+    if not math.isfinite(numeric):
+        return default
+
+    return round(numeric, 3)
 
 def run_aif360_audit(df: pd.DataFrame, 
                      label_col: str, 
@@ -26,9 +39,9 @@ def run_aif360_audit(df: pd.DataFrame,
     )
     
     metrics = {
-        "disparate_impact": round(metric_orig.disparate_impact(), 3),
-        "statistical_parity_difference": round(metric_orig.statistical_parity_difference(), 3),
-        "mean_difference": round(metric_orig.mean_difference(), 3)
+        "disparate_impact": _safe_round(metric_orig.disparate_impact(), 0.0),
+        "statistical_parity_difference": _safe_round(metric_orig.statistical_parity_difference(), 0.0),
+        "mean_difference": _safe_round(metric_orig.mean_difference(), 0.0)
     }
 
     # If predicted labels provided, add classification metrics
@@ -44,10 +57,10 @@ def run_aif360_audit(df: pd.DataFrame,
         )
         
         metrics.update({
-            "equal_opportunity_diff": round(metric_pred.equal_opportunity_difference(), 3),
-            "average_odds_diff": round(metric_pred.average_odds_difference(), 3),
-            "fnr_gap": round(metric_pred.false_negative_rate_difference(), 3),
-            "fpr_gap": round(metric_pred.false_positive_rate_difference(), 3)
+            "equal_opportunity_diff": _safe_round(metric_pred.equal_opportunity_difference(), 1.0),
+            "average_odds_diff": _safe_round(metric_pred.average_odds_difference(), 1.0),
+            "fnr_gap": _safe_round(metric_pred.false_negative_rate_difference(), 1.0),
+            "fpr_gap": _safe_round(metric_pred.false_positive_rate_difference(), 1.0)
         })
     
     return metrics
