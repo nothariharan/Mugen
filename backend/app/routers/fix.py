@@ -36,7 +36,10 @@ class FixResponse(BaseModel):
 async def start_fix(request: FixRequest):
     audit = AUDITS.get(request.audit_id)
     if not audit or audit.get("status") != "done":
-        raise HTTPException(status_code=404, detail="Audit result not found or not done")
+        raise HTTPException(
+            status_code=404,
+            detail="Audit session not found. The server may have restarted — please re-run the audit."
+        )
 
     df           = audit["full_df"].drop(columns=["y_pred"], errors="ignore")
     model        = audit["model"]

@@ -92,8 +92,14 @@ const FixPage: React.FC = () => {
       setFlow('results');
     } catch (err: any) {
       console.error(err);
-      setError('Mitigation failed. Please try again.');
-      setFlow('wizard');
+      if (err?.status === 404) {
+        // Audit session lost (server restarted) — clear stale state and re-audit
+        alert('Your audit session has expired (the server restarted). Please re-upload and re-run the audit.');
+        navigate('/');
+      } else {
+        setError(err?.message || 'Mitigation failed. Please try again.');
+        setFlow('wizard');
+      }
     }
   };
 
