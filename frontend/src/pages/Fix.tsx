@@ -8,11 +8,12 @@ import MitigationProcessing from '../components/MitigationProcessing';
 
 // ── Metric label helpers ──────────────────────────────────────────────────────
 
+// Maps wizard FairnessMetric enum → backend METRIC_ALIAS key
 function metricApiKey(metric: FairnessMetric): string {
   const map: Record<FairnessMetric, string> = {
-    demographic_parity: 'demographic_parity_difference',
-    equal_opportunity: 'equal_opportunity_difference',
-    equalized_odds: 'equalized_odds_difference',
+    demographic_parity: 'demographic_parity',
+    equal_opportunity:  'equal_opportunity',
+    equalized_odds:     'equalized_odds',
   };
   return map[metric];
 }
