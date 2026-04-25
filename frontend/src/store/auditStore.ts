@@ -15,6 +15,7 @@ interface AuditState {
   setDomain: (domain: 'hiring' | 'finance' | 'healthcare') => void;
   setAuditResult: (result: any) => void;
   setFixResult: (result: any) => void;
+  clearFixResult: () => void;
 }
 
 export const useAuditStore = create<AuditState>()(
@@ -33,5 +34,6 @@ export const useAuditStore = create<AuditState>()(
   setDomain: (domain) => set({ domain }),
   setAuditResult: (result) => set({ auditResult: result }),
   setFixResult: (result) => set({ fixResult: result }),
+  clearFixResult: () => set({ fixResult: null, fixId: null }),
 }), { name: 'mugen-audit-storage' })
 );

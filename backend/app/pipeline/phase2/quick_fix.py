@@ -19,10 +19,15 @@ def apply_fairlearn_fix(model, X: pd.DataFrame, y: pd.Series, sensitive_col: str
     """
     constraint = METRIC_TO_CONSTRAINT.get(fairness_metric, "demographic_parity")
 
+    # objective must match Fairlearn's exact constant strings:
+    # For demographic_parity / simple constraints: balanced_accuracy_score, accuracy_score,
+    #   selection_rate, true_positive_rate, true_negative_rate
+    # For equalized_odds: balanced_accuracy_score, accuracy_score
+    # We use balanced_accuracy_score — valid for both constraint families.
     optimizer = ThresholdOptimizer(
         estimator=model,
         constraints=constraint,
-        objective="balanced_accuracy",   # optimise accuracy while satisfying the constraint
+        objective="balanced_accuracy_score",
         predict_method="predict_proba",
         prefit=True,
     )

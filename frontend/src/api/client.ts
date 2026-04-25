@@ -33,7 +33,13 @@ export const apiClient = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ audit_id: auditId, pathway, fairness_metric: fairnessMetric }),
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok) {
+      const err = new Error(data?.detail || `HTTP ${response.status}`);
+      (err as any).status = response.status;
+      throw err;
+    }
+    return data;
   },
 
   async getReport(auditId: string, fixId: string) {
