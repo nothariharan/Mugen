@@ -329,12 +329,6 @@ const AuditPage: React.FC = () => {
                       <p className="text-sm font-bold uppercase tracking-[0.12em] text-ink">{heroTone.label}</p>
                     </div>
                     <p className="max-w-3xl text-2xl font-medium leading-relaxed text-ink">
-                      "{auditResult.plain_english_summary}"
-                    </p>
-                    <button
-                      onClick={() => navigate('/fix')}
-                      className="inline-flex items-center rounded-lg bg-ink px-6 py-3 text-sm font-bold text-paper transition-colors duration-300 hover:bg-brand-default"
-                    >
                       &ldquo;{auditResult.plain_english_summary}&rdquo;
                     </p>
                     <button onClick={() => navigate('/fix')} className="inline-flex items-center rounded-lg bg-ink px-6 py-3 text-sm font-bold text-paper transition-colors duration-300 hover:bg-brand-default">
