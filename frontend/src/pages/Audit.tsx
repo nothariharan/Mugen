@@ -124,7 +124,7 @@ function MetricStatusDot({ color }: { color: 'red' | 'amber' | 'green' }) {
 
 const AuditPage: React.FC = () => {
   const navigate = useNavigate();
-  const { uploadId, auditId, domain, setAuditId, auditResult, setAuditResult } = useAuditStore();
+  const { uploadId, auditId, domain, labelCol, sensitiveCol, setAuditId, auditResult, setAuditResult } = useAuditStore();
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('plain');
   const [displayScore, setDisplayScore] = useState(0);
@@ -137,7 +137,7 @@ const AuditPage: React.FC = () => {
 
     const start = async () => {
       try {
-        const { audit_id } = await apiClient.startAudit(uploadId, domain);
+        const { audit_id } = await apiClient.startAudit(uploadId, domain, labelCol, sensitiveCol);
         setAuditId(audit_id);
 
         const poll = setInterval(async () => {

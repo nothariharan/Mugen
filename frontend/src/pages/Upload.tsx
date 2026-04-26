@@ -6,8 +6,7 @@ import { useAuditStore } from '../store/auditStore';
 
 const UploadPage: React.FC = () => {
   const navigate = useNavigate();
-  const setUploadId = useAuditStore(s => s.setUploadId);
-  const setDomain = useAuditStore(s => s.setDomain);
+  const { setUploadId, setDomain, setUploadColumns, setLabelCol, setSensitiveCol } = useAuditStore();
   const [loading, setLoading] = useState(false);
   const [domain, setLocalDomain] = useState<'hiring' | 'finance' | 'healthcare'>('hiring');
 
@@ -21,7 +20,12 @@ const UploadPage: React.FC = () => {
         const res = await apiClient.upload(csvFile, pklFile);
         setUploadId(res.upload_id);
         setDomain(domain);
-        navigate('/audit');
+        // Store the column list so /schema can populate its dropdowns
+        setUploadColumns(res.columns ?? []);
+        // Reset any previously chosen columns
+        setLabelCol('');
+        setSensitiveCol('');
+        navigate('/schema');
       } catch (err) {
         console.error(err);
       } finally {
@@ -86,7 +90,13 @@ const UploadPage: React.FC = () => {
         <div className="flex flex-col items-center mt-12 pt-10 border-t border-surface animate-stagger-3">
           <div className="text-ink-faint text-xs mb-5 uppercase tracking-[0.2em] font-bold">or skip to demo</div>
           <button
-            onClick={() => { setUploadId('demo'); setDomain(domain); navigate('/audit'); }}
+            onClick={() => {
+              setUploadId('demo');
+              setDomain(domain);
+              setLabelCol('label');
+              setSensitiveCol('gender');
+              navigate('/audit');
+            }}
             className="px-8 py-4 bg-ink text-paper font-bold rounded duration-300 hover:bg-brand-default transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
           >
             Load Example (German Credit Demo)

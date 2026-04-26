@@ -174,6 +174,7 @@ const FixPage: React.FC = () => {
   if (!fixResult) return null;
 
   const improved = fixResult.after_score < fixResult.before_score;
+  const isDeepFix = fixResult.pathway === 'deep';
   const delta = Math.round(fixResult.before_score - fixResult.after_score);
   const pm = fixResult.post_fix_metrics ?? {};
   const diOk  = (pm.disparate_impact ?? 0) >= 0.80;
@@ -205,7 +206,11 @@ const FixPage: React.FC = () => {
               : 'bg-warning-default text-paper'
           }`}
         >
-          {improved ? 'Mitigation Complete' : 'Score Unchanged — Try Deep Fix'}
+          {improved
+            ? 'Mitigation Complete'
+            : isDeepFix
+            ? 'Score Unchanged — Review Dataset'
+            : 'Score Unchanged — Try Deep Fix'}
         </div>
 
         <h3 className="text-4xl font-display font-extrabold text-ink mb-12">
@@ -294,6 +299,13 @@ const FixPage: React.FC = () => {
                 <b>EU AI Act Article 10</b> requirements regarding{' '}
                 <b>{auditResult.recommended_metric}</b>.
               </>
+            ) : isDeepFix ? (
+              <>
+                Deep Fix ran but the bias score did not improve on this dataset.
+                AIF360 Reweighing may be insufficient for this distribution — try{' '}
+                <b>adjusting the fairness metric</b> or reviewing the dataset for
+                structural imbalances.
+              </>
             ) : (
               <>
                 The bias score did not improve. Consider switching to{' '}
@@ -325,7 +337,7 @@ const FixPage: React.FC = () => {
                 onClick={handleRetry}
                 className="px-8 py-4 bg-success-default text-paper font-bold rounded hover:opacity-90 transition-opacity"
               >
-                Try Deep Fix Instead
+                {isDeepFix ? 'Try Different Metric' : 'Try Deep Fix Instead'}
               </button>
             )}
           </div>
