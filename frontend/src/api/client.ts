@@ -13,11 +13,17 @@ export const apiClient = {
     return response.json();
   },
 
-  async startAudit(uploadId: string, domain: string, runSecurityScan: boolean = false) {
+  async startAudit(uploadId: string, domain: string, labelCol = '', sensitiveCol = '', runSecurityScan = false) {
     const response = await fetch(`${API_BASE_URL}/audit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ upload_id: uploadId, domain, run_security_scan: runSecurityScan }),
+      body: JSON.stringify({
+        upload_id: uploadId,
+        domain,
+        run_security_scan: runSecurityScan,
+        label_col: labelCol,
+        sensitive_col: sensitiveCol,
+      }),
     });
     return response.json();
   },

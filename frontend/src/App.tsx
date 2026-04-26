@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import UploadPage from './pages/Upload';
+import SchemaPage from './pages/Schema';
 import AuditPage from './pages/Audit';
 import FixPage from './pages/Fix';
 import ReportPage from './pages/Report';
@@ -26,6 +27,7 @@ const App: React.FC = () => {
         <main className="max-w-7xl mx-auto py-12 px-6 animate-in fade-in duration-500">
           <Routes>
             <Route path="/" element={<UploadPage />} />
+            <Route path="/schema" element={<SchemaPage />} />
             <Route path="/audit" element={<AuditPage />} />
             <Route path="/fix" element={<FixPage />} />
             <Route path="/report" element={<ReportPage />} />

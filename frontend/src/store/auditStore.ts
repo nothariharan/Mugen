@@ -8,6 +8,10 @@ interface AuditState {
   domain: 'hiring' | 'finance' | 'healthcare';
   auditResult: any | null;
   fixResult: any | null;
+  // Schema mapping — set on the /schema page for custom uploads
+  uploadColumns: string[];
+  labelCol: string;
+  sensitiveCol: string;
 
   setUploadId: (id: string) => void;
   setAuditId: (id: string) => void;
@@ -16,6 +20,9 @@ interface AuditState {
   setAuditResult: (result: any) => void;
   setFixResult: (result: any) => void;
   clearFixResult: () => void;
+  setUploadColumns: (cols: string[]) => void;
+  setLabelCol: (col: string) => void;
+  setSensitiveCol: (col: string) => void;
 }
 
 export const useAuditStore = create<AuditState>()(
@@ -27,6 +34,9 @@ export const useAuditStore = create<AuditState>()(
   domain: 'hiring',
   auditResult: null,
   fixResult: null,
+  uploadColumns: [],
+  labelCol: '',
+  sensitiveCol: '',
 
   setUploadId: (id) => set({ uploadId: id }),
   setAuditId: (id) => set({ auditId: id }),
@@ -35,5 +45,8 @@ export const useAuditStore = create<AuditState>()(
   setAuditResult: (result) => set({ auditResult: result }),
   setFixResult: (result) => set({ fixResult: result }),
   clearFixResult: () => set({ fixResult: null, fixId: null }),
+  setUploadColumns: (cols) => set({ uploadColumns: cols }),
+  setLabelCol: (col) => set({ labelCol: col }),
+  setSensitiveCol: (col) => set({ sensitiveCol: col }),
 }), { name: 'mugen-audit-storage' })
 );

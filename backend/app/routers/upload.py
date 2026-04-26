@@ -13,6 +13,7 @@ class UploadResponse(BaseModel):
     csv_rows: int
     pkl_size_kb: int
     security_scan_passed: bool
+    columns: list
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_files(csv_file: UploadFile = File(...), pkl_file: UploadFile = File(...)):
@@ -48,5 +49,6 @@ async def upload_files(csv_file: UploadFile = File(...), pkl_file: UploadFile = 
         "upload_id": upload_id,
         "csv_rows": csv_rows,
         "pkl_size_kb": pkl_size_kb,
-        "security_scan_passed": scan_result["passed"]
+        "security_scan_passed": scan_result["passed"],
+        "columns": df.columns.tolist()
     }

@@ -15,6 +15,8 @@ class AuditRequest(BaseModel):
     upload_id: str
     domain: str  # hiring|finance|healthcare
     run_security_scan: bool
+    label_col: str = ""          # empty → backend uses demo defaults or last-column fallback
+    sensitive_col: str = ""      # empty → backend uses demo defaults or gender/race fallback
 
 class CounterfactualRequest(BaseModel):
     audit_id: str
@@ -76,17 +78,24 @@ async def run_full_audit(audit_id: str, request: AuditRequest):
             df = pd.read_csv(upload_info["csv_path"])
             with open(upload_info["pkl_path"], 'rb') as f:
                 model = pickle.load(f)
-            # Assumption for hackathon: target is last column, sensitive is first demographic column or 'gender'
-            if 'gender' in df.columns:
+
+            # Use caller-supplied columns (from schema mapping screen)
+            label_col = request.label_col or df.columns[-1]
+            if request.sensitive_col and request.sensitive_col in df.columns:
+                sensitive_col = request.sensitive_col
+            elif 'gender' in df.columns:
                 sensitive_col = 'gender'
-                priv_group, unpriv_group = [{'gender': 1}], [{'gender': 0}]
             elif 'race' in df.columns:
                 sensitive_col = 'race'
-                priv_group, unpriv_group = [{'race': 1}], [{'race': 0}]
             else:
                 sensitive_col = df.columns[0]
-                priv_group, unpriv_group = [{sensitive_col: 1}], [{sensitive_col: 0}]
-            label_col = df.columns[-1]
+
+            # Derive priv/unpriv groups from the actual unique values
+            unique_vals = sorted(df[sensitive_col].dropna().unique().tolist())
+            priv_val  = unique_vals[-1] if unique_vals else 1
+            unpriv_val = unique_vals[0]  if len(unique_vals) > 1 else 0
+            priv_group   = [{sensitive_col: priv_val}]
+            unpriv_group = [{sensitive_col: unpriv_val}]
 
         # Get Predictions
         X = df.drop(columns=[label_col])
