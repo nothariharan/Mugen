@@ -13,8 +13,7 @@ const App: React.FC = () => {
         <header className="bg-paper/90 border-b border-surface py-5 px-8 sticky top-0 z-50 backdrop-blur-md">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-8 h-8 bg-brand-default rounded flex items-center justify-center font-display font-bold text-paper transition-transform duration-300 ease-out-expo group-hover:-translate-y-0.5">M</div>
-              <span className="text-xl font-display font-extrabold tracking-tight text-ink">Mugen</span>
+              <img src="/logo.png" alt="Mugen Logo" className="h-8 w-auto transition-transform duration-300 ease-out-expo group-hover:-translate-y-0.5" />
             </Link>
             <nav className="flex items-center space-x-10 text-sm font-medium text-ink-muted">
               <Link to="/" className="hover:text-ink transition-colors duration-200">How it works</Link>
