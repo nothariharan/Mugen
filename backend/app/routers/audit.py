@@ -152,7 +152,36 @@ async def run_full_audit(audit_id: str, request: AuditRequest):
             val.update({k: v for k, v in pt.items()})
             explorer_pts.append(val)
 
-        plain_summ = f"Your model detects bias. The Disparate Impact is {metrics.get('disparate_impact', 1.0)} and FNR gap is {metrics.get('fnr_gap', 0)}."
+        # ── Human-readable summary — no metric names, no decimals ──────────
+        _GROUP_LABELS = {
+            'gender': ('women', 'men'),
+            'sex':    ('women', 'men'),
+            'race':   ('minority applicants', 'majority applicants'),
+            'age':    ('older applicants', 'younger applicants'),
+        }
+        _unpriv_lbl, _priv_lbl = _GROUP_LABELS.get(
+            sensitive_col.lower(), ('the disadvantaged group', 'the reference group')
+        )
+        _di = metrics.get('disparate_impact', 1.0)
+        _fnr = abs(metrics.get('fnr_gap', 0))
+        if _di <= 0.05:
+            plain_summ = (
+                f"This model is completely failing {_unpriv_lbl}. "
+                f"Almost no {_unpriv_lbl} are being approved — the model is effectively "
+                f"making decisions based on demographics rather than qualifications."
+            )
+        elif _di < 0.8:
+            _pct = round((1 - _di) * 100)
+            plain_summ = (
+                f"This model shows serious bias against {_unpriv_lbl}. "
+                f"They receive roughly {_pct}% fewer approvals than equally qualified {_priv_lbl} — "
+                f"a clear violation of the legal 80% fairness rule."
+            )
+        else:
+            plain_summ = (
+                f"This model shows acceptable fairness between {_priv_lbl} and {_unpriv_lbl}. "
+                f"Approval rates are within legal thresholds for the {request.domain} domain."
+            )
         
         AUDITS[audit_id] = {
             "status": "done",
@@ -166,6 +195,8 @@ async def run_full_audit(audit_id: str, request: AuditRequest):
             "result": {
                 "bias_score": bias_info['bias_score'],
                 "plain_english_summary": plain_summ,
+                "priv_label": _priv_lbl,
+                "unpriv_label": _unpriv_lbl,
                 "fairness_metrics": metrics,
                 "recommended_metric": "equalized_odds" if request.domain != 'hiring' else 'demographic_parity',
                 "proxy_leakage": leakage,

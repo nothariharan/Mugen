@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronDown, ArrowLeft, ArrowRight, Tag, ShieldAlert, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuditStore } from '../store/auditStore';
 
-// Heuristic: score a column name to suggest it as label or sensitive attribute
 function looksLikeLabel(col: string): boolean {
   const c = col.toLowerCase();
   return ['label', 'target', 'outcome', 'class', 'y', 'result', 'approved', 'default'].some(
-    (kw) => c === kw || c.endsWith('_' + kw) || c.startsWith(kw + '_'),
+    kw => c === kw || c.endsWith('_' + kw) || c.startsWith(kw + '_'),
   );
 }
 function looksLikeSensitive(col: string): boolean {
@@ -14,34 +14,25 @@ function looksLikeSensitive(col: string): boolean {
   return [
     'gender', 'sex', 'race', 'ethnicity', 'age', 'age_group', 'nationality',
     'religion', 'protected', 'disability', 'marital',
-  ].some((kw) => c.includes(kw));
+  ].some(kw => c.includes(kw));
 }
 
 const SchemaPage: React.FC = () => {
   const navigate = useNavigate();
   const {
-    uploadId,
-    uploadColumns,
-    domain,
-    labelCol,
-    sensitiveCol,
-    setLabelCol,
-    setSensitiveCol,
+    uploadId, uploadColumns, domain,
+    labelCol, sensitiveCol,
+    setLabelCol, setSensitiveCol,
   } = useAuditStore();
 
-  // Guard: if no upload in progress, go home
   useEffect(() => {
-    if (!uploadId || uploadId === 'demo') {
-      navigate('/');
-    }
+    if (!uploadId || uploadId === 'demo') navigate('/');
   }, [uploadId, navigate]);
 
-  // Auto-select sensible defaults from the column list on first render
   const [initialised, setInitialised] = useState(false);
   useEffect(() => {
     if (initialised || uploadColumns.length === 0) return;
     setInitialised(true);
-
     if (!labelCol) {
       const guess = uploadColumns.find(looksLikeLabel) ?? uploadColumns[uploadColumns.length - 1];
       setLabelCol(guess);
@@ -53,6 +44,7 @@ const SchemaPage: React.FC = () => {
   }, [uploadColumns, labelCol, sensitiveCol, initialised, setLabelCol, setSensitiveCol]);
 
   const canProceed = labelCol && sensitiveCol && labelCol !== sensitiveCol;
+  const hasConflict = labelCol && sensitiveCol && labelCol === sensitiveCol;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[75vh] p-4 max-w-3xl mx-auto">
@@ -61,51 +53,48 @@ const SchemaPage: React.FC = () => {
         <div className="inline-flex items-center gap-2 mb-4 rounded-full bg-surface px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-ink-muted">
           Step 2 of 2
         </div>
-        <h1 className="text-4xl md:text-5xl font-display font-extrabold text-ink mb-4 tracking-tight leading-[1.1]">
+        <h1 className="text-4xl md:text-5xl font-display font-extrabold text-ink mb-4 tracking-tight leading-[1.08]">
           Confirm your dataset schema
         </h1>
         <p className="text-ink-muted text-base leading-relaxed max-w-lg mx-auto">
-          We detected <strong>{uploadColumns.length} columns</strong>. Tell us which column is the
+          We detected <strong className="text-ink">{uploadColumns.length} columns</strong>. Tell us which column is the
           outcome you want to predict and which identifies the protected group.
         </p>
       </div>
 
-      {/* Mapping card */}
-      <div className="w-full bg-paper border border-surface rounded-md p-10 space-y-10 animate-stagger-2">
+      {/* Card */}
+      <div className="w-full bg-paper border border-surface rounded-lg p-10 space-y-10 animate-stagger-2 shadow-sm">
+
         {/* Label column */}
         <div>
           <label
             htmlFor="label-col-select"
-            className="block text-sm font-bold text-ink mb-1 uppercase tracking-wider"
+            className="flex items-center gap-2 text-xs font-bold text-ink mb-1 uppercase tracking-widest"
           >
+            <Tag className="h-3.5 w-3.5 text-ink-muted" />
             Outcome / Label column
           </label>
-          <p className="text-ink-faint text-sm mb-3 leading-relaxed">
+          <p className="text-ink-muted text-sm mb-3 leading-relaxed">
             The column your model was trained to predict (e.g.{' '}
-            <code className="bg-surface px-1 rounded text-xs">approved</code>,{' '}
-            <code className="bg-surface px-1 rounded text-xs">label</code>,{' '}
-            <code className="bg-surface px-1 rounded text-xs">default</code>).
+            <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">approved</code>,{' '}
+            <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">label</code>,{' '}
+            <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">default</code>).
           </p>
           <div className="relative">
             <select
               id="label-col-select"
-              className="w-full p-4 border border-surface rounded bg-surface hover:border-ink transition-colors outline-none cursor-pointer appearance-none font-medium text-ink"
+              className="w-full p-4 border border-surface rounded-md bg-surface hover:border-ink-muted focus:outline-none focus:border-brand-default transition-colors cursor-pointer appearance-none font-medium text-ink text-sm"
               value={labelCol}
-              onChange={(e) => setLabelCol(e.target.value)}
+              onChange={e => setLabelCol(e.target.value)}
             >
               <option value="" disabled>Select a column…</option>
-              {uploadColumns.map((col) => (
+              {uploadColumns.map(col => (
                 <option key={col} value={col}>
-                  {col}
-                  {looksLikeLabel(col) ? ' ✦ suggested' : ''}
+                  {col}{looksLikeLabel(col) ? ' ✦ suggested' : ''}
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-ink-muted">
-              <svg className="fill-current h-4 w-4" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
+            <ChevronDown className="pointer-events-none absolute inset-y-0 right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
           </div>
         </div>
 
@@ -113,77 +102,79 @@ const SchemaPage: React.FC = () => {
         <div>
           <label
             htmlFor="sensitive-col-select"
-            className="block text-sm font-bold text-ink mb-1 uppercase tracking-wider"
+            className="flex items-center gap-2 text-xs font-bold text-ink mb-1 uppercase tracking-widest"
           >
+            <ShieldAlert className="h-3.5 w-3.5 text-ink-muted" />
             Protected attribute column
           </label>
-          <p className="text-ink-faint text-sm mb-3 leading-relaxed">
+          <p className="text-ink-muted text-sm mb-3 leading-relaxed">
             The demographic column the audit checks for bias (e.g.{' '}
-            <code className="bg-surface px-1 rounded text-xs">gender</code>,{' '}
-            <code className="bg-surface px-1 rounded text-xs">race</code>,{' '}
-            <code className="bg-surface px-1 rounded text-xs">age_group</code>).
+            <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">gender</code>,{' '}
+            <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">race</code>,{' '}
+            <code className="bg-surface px-1.5 py-0.5 rounded text-xs font-mono">age_group</code>).
           </p>
           <div className="relative">
             <select
               id="sensitive-col-select"
-              className="w-full p-4 border border-surface rounded bg-surface hover:border-ink transition-colors outline-none cursor-pointer appearance-none font-medium text-ink"
+              className="w-full p-4 border border-surface rounded-md bg-surface hover:border-ink-muted focus:outline-none focus:border-brand-default transition-colors cursor-pointer appearance-none font-medium text-ink text-sm"
               value={sensitiveCol}
-              onChange={(e) => setSensitiveCol(e.target.value)}
+              onChange={e => setSensitiveCol(e.target.value)}
             >
               <option value="" disabled>Select a column…</option>
               {uploadColumns
-                .filter((col) => col !== labelCol)
-                .map((col) => (
+                .filter(col => col !== labelCol)
+                .map(col => (
                   <option key={col} value={col}>
-                    {col}
-                    {looksLikeSensitive(col) ? ' ✦ suggested' : ''}
+                    {col}{looksLikeSensitive(col) ? ' ✦ suggested' : ''}
                   </option>
                 ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-ink-muted">
-              <svg className="fill-current h-4 w-4" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
+            <ChevronDown className="pointer-events-none absolute inset-y-0 right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
           </div>
         </div>
 
         {/* Confirmation strip */}
         {canProceed && (
-          <div className="rounded-lg border border-surface bg-surface/50 px-5 py-3 text-sm text-ink-muted animate-in fade-in duration-300">
-            Auditing <strong className="text-ink">{domain}</strong> domain · predicting{' '}
-            <code className="bg-paper border border-surface rounded px-1">{labelCol}</code> · protected
-            attribute{' '}
-            <code className="bg-paper border border-surface rounded px-1">{sensitiveCol}</code>
+          <div className="flex items-start gap-3 rounded-md border border-surface bg-surface/50 px-5 py-4 text-sm text-ink-muted">
+            <CheckCircle2 className="h-4 w-4 text-success-default shrink-0 mt-0.5" />
+            <span>
+              Auditing <strong className="text-ink">{domain}</strong> domain · predicting{' '}
+              <code className="bg-paper border border-surface rounded px-1 font-mono text-xs">{labelCol}</code>{' '}
+              · protected attribute{' '}
+              <code className="bg-paper border border-surface rounded px-1 font-mono text-xs">{sensitiveCol}</code>
+            </span>
           </div>
         )}
 
         {/* Validation error */}
-        {labelCol && sensitiveCol && labelCol === sensitiveCol && (
-          <p className="text-sm text-danger-default font-medium">
+        {hasConflict && (
+          <div className="flex items-center gap-2 text-sm text-danger-default font-medium">
+            <AlertCircle className="h-4 w-4 shrink-0" />
             Label and protected attribute must be different columns.
-          </p>
+          </div>
         )}
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-4 border-t border-surface">
           <button
             onClick={() => navigate('/')}
-            className="text-sm font-medium text-ink-muted hover:text-ink transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted hover:text-ink transition-colors duration-200"
           >
-            ← Back
+            <ArrowLeft className="h-4 w-4" />
+            Back
           </button>
           <button
             id="schema-confirm-btn"
             disabled={!canProceed}
             onClick={() => navigate('/audit')}
-            className={`px-8 py-4 font-bold rounded transition-all duration-300 ${
+            className={`inline-flex items-center gap-2 px-8 py-4 font-bold rounded-md transition-all duration-200 ${
               canProceed
-                ? 'bg-ink text-paper hover:bg-brand-default shadow-sm hover:shadow-md hover:-translate-y-0.5'
+                ? 'bg-ink text-paper hover:bg-brand-default shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-default'
                 : 'bg-surface text-ink-faint cursor-not-allowed'
             }`}
           >
-            Run Audit →
+            Run Audit
+            <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       </div>
