@@ -10,22 +10,34 @@ export interface PipelineNodeData {
 }
 
 export function PipelineNode({ data }: { data: PipelineNodeData }) {
+  const border = data.isActive
+    ? '1.5px solid rgba(255,255,255,0.70)'
+    : data.isCompleted
+    ? '1px solid rgba(52,211,153,0.35)'
+    : data.isOutput
+    ? '1.5px solid rgba(255,255,255,0.22)'
+    : '1px solid rgba(255,255,255,0.10)';
+
+  const bg = data.isActive
+    ? 'rgba(255,255,255,0.08)'
+    : data.isOutput
+    ? 'rgba(255,255,255,0.06)'
+    : data.isCompleted
+    ? 'rgba(52,211,153,0.06)'
+    : 'rgba(255,255,255,0.03)';
+
+  const glow = data.isActive
+    ? '0 0 0 3px rgba(255,255,255,0.08), 0 4px 20px rgba(255,255,255,0.06)'
+    : 'none';
+
   return (
     <div
       style={{
         width: 160,
         height: 64,
         borderRadius: 10,
-        border: data.isActive
-          ? '2px solid #0F172A'
-          : data.isCompleted
-          ? '1px solid #CBD5E1'
-          : '1.5px solid #E2E8F0',
-        background: data.isActive
-          ? '#0F172A'
-          : data.isOutput
-          ? '#0F172A'
-          : '#FFFFFF',
+        border,
+        background: bg,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -34,36 +46,43 @@ export function PipelineNode({ data }: { data: PipelineNodeData }) {
         cursor: 'pointer',
         position: 'relative',
         transition: 'all 200ms ease',
-        boxShadow: data.isActive ? '0 0 0 4px oklch(0.95 0.02 250)' : 'none',
+        boxShadow: glow,
+        backdropFilter: 'blur(8px)',
       }}
     >
-      {/* Completed checkmark — success green */}
+      {/* Completed tick */}
       {data.isCompleted && !data.isActive && (
         <span
           style={{
             position: 'absolute',
-            top: 4,
-            right: 6,
-            fontSize: 10,
-            color: 'oklch(0.6 0.15 150)',
-            lineHeight: 1,
+            top: 5,
+            right: 7,
+            fontSize: 9,
+            color: 'rgba(52,211,153,0.85)',
             fontWeight: 700,
+            lineHeight: 1,
           }}
         >
           ✓
         </span>
       )}
 
-      {/* Title */}
+      {/* Label */}
       <span
         style={{
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: 600,
-          color: data.isActive || data.isOutput ? '#FFFFFF' : '#0F172A',
-          opacity: data.isCompleted && !data.isActive ? 0.6 : 1,
+          color: data.isActive
+            ? '#ffffff'
+            : data.isOutput
+            ? 'rgba(255,255,255,0.90)'
+            : data.isCompleted
+            ? 'rgba(255,255,255,0.55)'
+            : 'rgba(255,255,255,0.80)',
           textAlign: 'center',
           lineHeight: 1.3,
           userSelect: 'none',
+          letterSpacing: '-0.01em',
         }}
       >
         {data.label}
@@ -72,30 +91,22 @@ export function PipelineNode({ data }: { data: PipelineNodeData }) {
       {/* Subtitle */}
       <span
         style={{
-          fontSize: 11,
-          color:
-            data.isActive || data.isOutput
-              ? 'rgba(255,255,255,0.65)'
-              : '#94A3B8',
+          fontSize: 10,
           marginTop: 2,
           textAlign: 'center',
           userSelect: 'none',
+          color: data.isActive
+            ? 'rgba(255,255,255,0.45)'
+            : 'rgba(255,255,255,0.25)',
+          letterSpacing: '0.02em',
         }}
       >
         {data.subtitle}
       </span>
 
-      {/* ReactFlow connection handles — hidden visually */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        style={{ background: 'transparent', border: 'none', width: 0, height: 0 }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        style={{ background: 'transparent', border: 'none', width: 0, height: 0 }}
-      />
+      {/* Handles — invisible */}
+      <Handle type="target" position={Position.Top}    style={{ background: 'transparent', border: 'none', width: 0, height: 0 }} />
+      <Handle type="source" position={Position.Bottom} style={{ background: 'transparent', border: 'none', width: 0, height: 0 }} />
     </div>
   );
 }
