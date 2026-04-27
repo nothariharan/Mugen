@@ -6,9 +6,10 @@ import SchemaPage from './pages/Schema';
 import AuditPage from './pages/Audit';
 import FixPage from './pages/Fix';
 import ReportPage from './pages/Report';
+import HowItWorksPage from './pages/HowItWorks';
 
 const NAV_LINKS = [
-  { to: '/', label: 'How it works', icon: BookOpen },
+  { to: '/how-it-works', label: 'How it works', icon: BookOpen },
   { to: '/', label: 'Documentation', icon: HelpCircle },
 ] as const;
 
@@ -54,11 +55,12 @@ const AppShell: React.FC = () => {
       {/* Main */}
       <main className="max-w-7xl mx-auto py-12 px-6">
         <Routes>
-          <Route path="/"        element={<UploadPage />} />
-          <Route path="/schema"  element={<SchemaPage />} />
-          <Route path="/audit"   element={<AuditPage />} />
-          <Route path="/fix"     element={<FixPage />} />
-          <Route path="/report"  element={<ReportPage />} />
+          <Route path="/"              element={<UploadPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/schema"        element={<SchemaPage />} />
+          <Route path="/audit"         element={<AuditPage />} />
+          <Route path="/fix"           element={<FixPage />} />
+          <Route path="/report"        element={<ReportPage />} />
         </Routes>
       </main>
 
