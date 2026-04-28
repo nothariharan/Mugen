@@ -8,11 +8,12 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY requirements.txt .
+# Copy requirements and install
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all application files
-COPY app/ ./app/
+COPY backend/app/ ./app/
 
 # Environment Variables
 ENV PORT=8080
