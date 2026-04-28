@@ -46,6 +46,3 @@ venv_39/
 backend/uploads/
 backend/tmp/
 
-# Agent / Skills (local tool configurations)
-.agents/
-skills-lock.json

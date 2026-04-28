@@ -1,15 +1,3 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { BookOpen, HelpCircle, LifeBuoy } from 'lucide-react';
-import UploadPage from './pages/Upload';
-import SchemaPage from './pages/Schema';
-import AuditPage from './pages/Audit';
-import FixPage from './pages/Fix';
-import ReportPage from './pages/Report';
-import HowItWorksPage from './pages/HowItWorks';
-import Hero from './components/Hero';
-
-const NAV_LINKS = [
   { to: '/how-it-works', label: 'How it works', icon: BookOpen },
   { to: '/', label: 'Documentation', icon: HelpCircle },
 ] as const;

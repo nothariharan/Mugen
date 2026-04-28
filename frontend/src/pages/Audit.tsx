@@ -41,7 +41,12 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.32, ease: [0.4, 0, 0.2, 1] as const },
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
+  },
+  hover: {
+    y: -4,
+    scale: 1.01,
+    transition: { duration: 0.25, ease: 'easeOut' },
   },
 };
 
@@ -347,7 +352,7 @@ const AuditPage: React.FC = () => {
                 </div>
               </motion.section>
 
-              <motion.section variants={cardVariants} className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <motion.section variants={cardVariants} whileHover="hover" className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <article className="rounded-lg border border-surface bg-paper p-5 shadow-sm">
                   <div className="mb-4 flex items-start justify-between">
                     <Scale className="h-5 w-5 text-ink-muted" />
@@ -393,12 +398,12 @@ const AuditPage: React.FC = () => {
                 </article>
               </motion.section>
 
-              <motion.section variants={cardVariants} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <motion.section variants={cardVariants} whileHover="hover" className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">Audit Trail — At a Glance</p>
                 <SeverityTimeline items={severityItems} />
               </motion.section>
 
-              <motion.section variants={cardVariants} className="rounded-lg border border-surface bg-paper p-6 shadow-sm">
+              <motion.section variants={cardVariants} whileHover="hover" className="rounded-lg border border-surface bg-paper p-6 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Brain className="h-4 w-4 text-ink-muted" />
                   <p className="text-[11px] font-bold uppercase tracking-widest text-ink-muted">Why is the model biased?</p>
