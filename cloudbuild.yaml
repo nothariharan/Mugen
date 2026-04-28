@@ -1,11 +1,11 @@
 steps:
   # Build the container image using the root context
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA', '.', '-f', 'Dockerfile']
+    args: ['build', '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/mugen:$COMMIT_SHA', '.', '-f', 'Dockerfile']
 
-  # Push the container image to Artifact Registry (using the variables from your trigger)
+  # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA']
+    args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/mugen:$COMMIT_SHA']
 
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -13,18 +13,18 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - '$_SERVICE_NAME'
+      - 'mugen'
       - '--image'
-      - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/mugen:$COMMIT_SHA'
       - '--region'
-      - '$_DEPLOY_REGION'
+      - 'europe-west1'
       - '--allow-unauthenticated'
       - '--max-instances'
       - '1'
       - '--session-affinity'
 
 images:
-  - '$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_SERVICE_NAME:$COMMIT_SHA'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/mugen:$COMMIT_SHA'
 
 options:
   machineType: 'E2_HIGHCPU_8'
