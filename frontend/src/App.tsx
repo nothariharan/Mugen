@@ -1,3 +1,16 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BookOpen, HelpCircle, LifeBuoy } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import UploadPage from './pages/Upload';
+import SchemaPage from './pages/Schema';
+import AuditPage from './pages/Audit';
+import FixPage from './pages/Fix';
+import ReportPage from './pages/Report';
+import HowItWorksPage from './pages/HowItWorks';
+import Hero from './components/Hero';
+
+const NAV_LINKS = [
   { to: '/how-it-works', label: 'How it works', icon: BookOpen },
   { to: '/', label: 'Documentation', icon: HelpCircle },
 ] as const;
@@ -77,14 +90,24 @@ const AppShell: React.FC = () => {
 
       {/* ── Main ─────────────────────────────────────────────────── */}
       <main className={isDark ? '' : 'max-w-7xl mx-auto py-12 px-6'}>
-        <Routes>
-          <Route path="/"              element={<UploadPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/schema"        element={<SchemaPage />} />
-          <Route path="/audit"         element={<AuditPage />} />
-          <Route path="/fix"           element={<FixPage />} />
-          <Route path="/report"        element={<ReportPage />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
+            <Routes location={location} key={location.pathname}>
+              <Route path="/"              element={<UploadPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/schema"        element={<SchemaPage />} />
+              <Route path="/audit"         element={<AuditPage />} />
+              <Route path="/fix"           element={<FixPage />} />
+              <Route path="/report"        element={<ReportPage />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* ── Footer ───────────────────────────────────────────────── */}

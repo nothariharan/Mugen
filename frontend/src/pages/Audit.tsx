@@ -46,11 +46,12 @@ const cardVariants = {
   hover: {
     y: -4,
     scale: 1.01,
-    transition: { duration: 0.25, ease: 'easeOut' },
+    transition: { duration: 0.25, ease: 'easeOut' as const },
   },
 };
 
 const sectionLabelClassName = 'mb-4 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-faint';
+
 
 function formatLabel(value: string) {
   return value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
